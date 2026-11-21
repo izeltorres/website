@@ -6,13 +6,8 @@ Based on `problem.md`.
 A website where people can write down their thoughts on books and films they have watched or read, rate them, and read what others have written.
 
 ## Constraints
-- Written in plain HTML, CSS, and JavaScript. No frameworks, libraries, or build step.
 - Everything is free: no paid hosting, databases, APIs, or accounts. Free hosting option: GitHub Pages.
 - Works by opening `index.html` in a browser, with no internet connection required.
-
-## Data storage
-- All data is saved in the browser's `localStorage`.
-- Because of this, reviews are shared only between people using the same browser on the same device. Sharing between devices would need a server or database, which is out of scope (see below).
 
 ## Features
 
@@ -24,12 +19,12 @@ A website where people can write down their thoughts on books and films they hav
 ### 2. Write thoughts and a rating (requirement: intake a description of thoughts)
 - On any book or film, a person enters:
   - their name (required),
-  - a rating from 1 to 5 stars (required),
+  - a fill in from a 5-star animation
   - a description of their thoughts (required).
 - The review is saved with the date it was written.
 
 ### 3. One review per person per book or film (requirement: write and rate once per film or book)
-- A person (identified by name, case-insensitive) can write only one review for each book or film.
+- A person (identified by name (first and last), case-insensitive) can write only one review for each book or film.
 - If the same name tries to review the same title again, the review is rejected and a message explains why.
 
 ### 4. Read others' thoughts (problem: allow others to write their thoughts)
@@ -43,9 +38,6 @@ A website where people can write down their thoughts on books and films they hav
 
 ## Out of scope
 - User accounts and passwords.
-- Sharing reviews across different devices or browsers.
-- Editing or deleting reviews.
-- Book or film details from outside sources (covers, authors, release dates).
 
 ## Acceptance checks
 1. Adding "Dune" as a Book shows it in the list; adding "dune" as a Book again shows an error.
