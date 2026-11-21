@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book and Film Thoughts</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Book and Film Thoughts</h1>
+    <p>Write down your thoughts on books and films, rate them, and read what others think.</p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>Add a book or film</h2>
+      <form id="add-form" class="add-form">
+        <label>
+          Type
+          <select name="type">
+            <option value="book">Book</option>
+            <option value="film">Film</option>
+          </select>
+        </label>
+        <label class="grow">
+          Title
+          <input name="title" type="text" maxlength="200" required>
+        </label>
+        <button type="submit">Add</button>
+      </form>
+      <p id="add-message" class="message" role="status"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Books and films</h2>
+      <div class="controls">
+        <div class="filters" role="group" aria-label="Filter by type">
+          <button type="button" class="filter active" data-filter="all">All</button>
+          <button type="button" class="filter" data-filter="book">Books</button>
+          <button type="button" class="filter" data-filter="film">Films</button>
+        </div>
+        <input id="search" type="search" placeholder="Search titles" aria-label="Search titles">
+      </div>
+      <p id="empty" class="empty">Nothing here yet. Add a book or film above.</p>
+      <ul id="items" class="items"></ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>Reviews are saved in this browser.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

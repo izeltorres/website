@@ -1,0 +1,202 @@
+:root {
+  --bg: #f6f4ef;
+  --panel: #ffffff;
+  --text: #222222;
+  --muted: #666666;
+  --border: #dddddd;
+  --accent: #2f5d8a;
+  --accent-text: #ffffff;
+  --star: #e0a100;
+  --star-empty: #cfcfcf;
+  --error: #b00020;
+  --ok: #1d7a3a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17181b;
+    --panel: #222429;
+    --text: #eeeeee;
+    --muted: #aaaaaa;
+    --border: #3a3d44;
+    --accent: #6fa3d8;
+    --accent-text: #111111;
+    --star: #f0b429;
+    --star-empty: #4a4d55;
+    --error: #ff7b8a;
+    --ok: #6fd391;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+header, main, footer {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+header { padding-top: 32px; }
+header h1 { margin: 0 0 4px; }
+header p, footer p { color: var(--muted); margin: 0 0 16px; }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.panel h2 { margin-top: 0; font-size: 1.25rem; }
+
+label { display: flex; flex-direction: column; gap: 4px; font-size: 0.9rem; }
+
+input, select, textarea, button { font: inherit; }
+
+input, select, textarea {
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+textarea { resize: vertical; min-height: 80px; }
+
+button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--accent-text);
+  cursor: pointer;
+}
+
+.add-form { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.grow { flex: 1 1 200px; }
+
+.message { margin: 8px 0 0; min-height: 1.5em; font-size: 0.9rem; }
+.message.error { color: var(--error); }
+.message.ok { color: var(--ok); }
+
+.controls { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.controls input { flex: 1 1 180px; }
+
+.filters { display: flex; gap: 4px; }
+.filter { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.filter.active { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+
+.empty { color: var(--muted); }
+
+.items { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+
+.card { border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; }
+.card-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+.card-head h3 { margin: 0; font-size: 1.1rem; overflow-wrap: anywhere; }
+
+.badge {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0 8px;
+  color: var(--muted);
+}
+
+.summary { display: flex; align-items: center; gap: 6px; margin: 4px 0 8px; color: var(--muted); font-size: 0.9rem; }
+
+/* Read-only stars. --fill is the filled percentage (0 to 100). */
+.stars {
+  position: relative;
+  display: inline-block;
+  color: var(--star-empty);
+  letter-spacing: 1px;
+  line-height: 1;
+}
+.stars::before { content: "★★★★★"; }
+.stars::after {
+  content: "★★★★★";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--fill, 0%);
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--star);
+}
+
+.reviews { list-style: none; padding: 0; margin: 0 0 8px; }
+.review { border-top: 1px solid var(--border); padding: 8px 0; }
+.review-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.review-head time { color: var(--muted); font-size: 0.8rem; }
+.review p { margin: 4px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+details summary { cursor: pointer; color: var(--accent); }
+.review-form { display: grid; gap: 10px; margin-top: 8px; }
+.review-form .row { display: flex; flex-wrap: wrap; gap: 8px; }
+.review-form .row label { flex: 1 1 160px; }
+.review-form button { justify-self: start; }
+
+/* ---------- Clickable 5-star rating ---------- */
+.rating-field { border: none; padding: 0; margin: 0; }
+.rating-field legend { font-size: 0.9rem; padding: 0; margin-bottom: 4px; }
+.rating-row { display: flex; align-items: center; gap: 10px; }
+
+/* Stars are in the HTML from 5 down to 1, then reversed visually,
+   so "a checked star and every star after it" means "this star and the ones to its left". */
+.star-input { display: inline-flex; flex-direction: row-reverse; }
+
+.star-input input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.star-input label {
+  display: block;
+  font-size: 2rem;
+  line-height: 1;
+  padding: 0 2px;
+  color: var(--star-empty);
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.star-input input:checked ~ label,
+.star-input label:hover,
+.star-input label:hover ~ label { color: var(--star); }
+
+.star-input label:hover { transform: scale(1.2); }
+
+.star-input input:focus-visible + label {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.star-input label.pop { animation: star-pop 0.4s ease both; }
+
+@keyframes star-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.45) rotate(-12deg); }
+  70%  { transform: scale(0.9) rotate(4deg); }
+  100% { transform: scale(1); }
+}
+
+.rating-text { color: var(--muted); font-size: 0.9rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .star-input label { transition: none; }
+  .star-input label.pop { animation: none; }
+}
