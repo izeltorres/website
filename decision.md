@@ -41,3 +41,11 @@ A record of decisions made by the project owner. Add new decisions to the end of
 
 ### 9. Rebuild the website from the updated spec
 **Decision:** Build the website from the current `SPEC.md` and `CLAUDE.md`. Add a `README.md`. Commit all files.
+
+## Session: 2026-11-22
+
+### 10. Automatic tests
+**Decision:** Add `tests/tests.html`, a page that loads `script.js` and runs every acceptance check in `SPEC.md`, listing PASS or FAIL for each. It uses no test framework, so it still needs nothing installed. The README gives the commands to open the site and the tests.
+
+### 11. problem.md as the first commit
+**Decision:** Rewrite the repository's history so the first commit contains only `problem.md` (the owner's text, unchanged), dropping GitHub's auto-created `.gitattributes` commit and the commit that later deleted it. Force-pushed.

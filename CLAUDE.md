@@ -10,7 +10,8 @@ A website for writing and reading thoughts and ratings on books and films. This 
 - `decision.md`: every decision the owner makes. Add each new decision to the end, under a heading for the current session.
 - `handoff.md`: where the project stands and what to do next. Read it at the start of a session and update it at the end.
 - `index.html`, `style.css`, `script.js`: the website.
-- `README.md`: overview and how to run it. Keep it up to date.
+- `README.md`: overview and how to run the site and the tests. Keep it up to date.
+- `tests/tests.html`: the automatic tests.
 
 ## Rules
 - Everything must be free: no paid hosting, databases, APIs, or accounts. Hosting is GitHub Pages.
@@ -22,4 +23,7 @@ A website for writing and reading thoughts and ratings on books and films. This 
 - Do not commit or push unless the owner asks.
 
 ## Testing
-There is no test framework. Open `index.html` in a browser and run through the acceptance checks in `SPEC.md`.
+`tests/tests.html` holds the automatic tests (no framework). Run them with `start tests/tests.html` (Windows)
+and check that the top line says all tests passed. Each check is named after the `SPEC.md` feature or
+acceptance check it tests. Its markup is a copy of `index.html`'s, so update it when `index.html` changes.
+Add a check for every new feature or acceptance check.

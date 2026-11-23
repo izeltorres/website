@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Book and Film Thoughts - tests</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    #report { font-family: monospace; background: #111; color: #eee; padding: 10px; }
+    #report .pass { color: #7ddc6a; }
+    #report .fail { color: #ff6b5b; }
+    #site { display: none; } /* the site's markup is only here for script.js to use */
+  </style>
+  <script>
+    // Runs before script.js loads: keep any real reviews safe and start the site empty.
+    const STORAGE_KEY_UNDER_TEST = "book-film-thoughts-v2";
+    let savedRealData = null;
+    try {
+      savedRealData = localStorage.getItem(STORAGE_KEY_UNDER_TEST);
+      localStorage.removeItem(STORAGE_KEY_UNDER_TEST);
+    } catch (e) { /* storage blocked: the save test will report it */ }
+  </script>
+</head>
+<body>
+  <!-- Open this file in a browser (see README.md, "Running the tests").
+       Each check is named after the SPEC.md feature or acceptance check it tests. -->
+  <div id="report">
+    <h2 id="summary">Running tests...</h2>
+    <ul id="results"></ul>
+  </div>
+
+  <!-- Same markup as index.html. Keep the two in step. -->
+  <div id="site">
+    <form id="add-form" class="add-form">
+      <select name="type">
+        <option value="book">Book</option>
+        <option value="film">Film</option>
+      </select>
+      <input name="title" type="text" maxlength="200" required>
+      <button type="submit">Add</button>
+    </form>
+    <p id="add-message" class="message" role="status"></p>
+    <div class="filters">
+      <button type="button" class="filter active" data-filter="all">All</button>
+      <button type="button" class="filter" data-filter="book">Books</button>
+      <button type="button" class="filter" data-filter="film">Films</button>
+    </div>
+    <input id="search" type="search">
+    <p id="empty" class="empty"></p>
+    <ul id="items" class="items"></ul>
+  </div>
+
+  <script src="../script.js"></script>
+  <script>
+    const results = [];
+    function check(name, test) {
+      let ok = false;
+      let error = "";
+      try { ok = !!test(); } catch (e) { error = " (error: " + e.message + ")"; }
+      results.push({ name: name + error, ok });
+    }
+
+    // ---------- Helpers that use the page like a person would ----------
+    function addTitle(type, title) {
+      addForm.elements.type.value = type;
+      addForm.elements.title.value = title;
+      addForm.dispatchEvent(new Event("submit", { cancelable: true }));
+      return document.getElementById("add-message").textContent;
+    }
+    function cards() {
+      return Array.from(document.querySelectorAll("#items > li.card"));
+    }
+    function shownTitles() {
+      return cards().map((c) => c.querySelector("h3").textContent);
+    }
+    function card(title, type) {
+      const badge = type === "film" ? "Film" : "Book";
+      return cards().find((c) => c.querySelector("h3").textContent === title &&
+                                 c.querySelector(".badge").textContent === badge);
+    }
+    function review(title, type, first, last, rating, thoughts) {
+      const form = card(title, type).querySelector("form.review-form");
+      form.elements.first.value = first;
+      form.elements.last.value = last;
+      form.elements.thoughts.value = thoughts;
+      if (rating) form.querySelector(`input[name="rating"][value="${rating}"]`).checked = true;
+      form.dispatchEvent(new Event("submit", { cancelable: true }));
+      const msg = card(title, type).querySelector("p[role='status']");
+      return msg ? msg.textContent : "";
+    }
+    function item(title, type) {
+      return data.items.find((i) => i.title === title && i.type === type);
+    }
+    function setFilter(f) {
+      document.querySelector(`.filter[data-filter="${f}"]`).click();
+    }
+    function search(text) {
+      const box = document.getElementById("search");
+      box.value = text;
+      box.dispatchEvent(new Event("input"));
+    }
+
+    try {
+      // ================= Starting state =================
+      check("Empty site says there is nothing yet", () =>
+        cards().length === 0 && !document.getElementById("empty").hidden);
+
+      // ================= Feature 1: add a book or film =================
+      check("Acceptance 1: adding Dune as a Book shows it in the list", () => {
+        addTitle("book", "Dune");
+        return shownTitles().includes("Dune") && card("Dune", "book");
+      });
+      check("Acceptance 1: adding \"dune\" as a Book again shows an error", () => {
+        const msg = addTitle("book", "dune");
+        return /already in the list/.test(msg) && data.items.filter((i) => i.type === "book").length === 1;
+      });
+      check("Acceptance 2: adding Dune as a Film is allowed", () => {
+        addTitle("film", "Dune");
+        return card("Dune", "film") && cards().length === 2;
+      });
+      check("Feature 1: an empty title is rejected", () => {
+        const before = data.items.length;
+        const msg = addTitle("book", "   ");
+        return /enter a title/i.test(msg) && data.items.length === before;
+      });
+      check("Feature 1: titles are trimmed of extra spaces", () => {
+        addTitle("book", "   Emma   ");
+        return item("Emma", "book") !== undefined;
+      });
+
+      // ================= Features 2-4: reviews =================
+      check("Acceptance 3: a review with name, rating and thoughts shows under its title", () => {
+        const msg = review("Dune", "book", "Ana", "Lopez", 4, "Great world building.");
+        const c = card("Dune", "book");
+        return /review was added/.test(msg) &&
+               c.querySelector(".review strong").textContent === "Ana Lopez" &&
+               c.querySelector(".review p").textContent === "Great world building.";
+      });
+      check("Feature 2: the review is saved with its date", () => {
+        const r = item("Dune", "book").reviews[0];
+        return r.date && !isNaN(Date.parse(r.date)) && card("Dune", "book").querySelector(".review time");
+      });
+      check("Acceptance 3: the average rating and review count update", () => {
+        review("Dune", "book", "Ben", "Kim", 2, "Too slow for me.");
+        const text = card("Dune", "book").querySelector(".summary").textContent;
+        return text.includes("3.0 average") && text.includes("2 reviews");
+      });
+      check("Acceptance 4: the same name (any capitalization) can't review the same title twice", () => {
+        const msg = review("Dune", "book", "ANA", "lopez", 5, "Second try.");
+        return /already reviewed/.test(msg) && item("Dune", "book").reviews.length === 2;
+      });
+      check("Feature 3: the same person can still review a different title", () => {
+        const msg = review("Dune", "film", "Ana", "Lopez", 5, "Loved the film.");
+        return /review was added/.test(msg) && item("Dune", "film").reviews.length === 1;
+      });
+      check("Feature 2: a review without a last name is rejected", () => {
+        const msg = review("Emma", "book", "Cara", "", 3, "Fine.");
+        return /first and last name/.test(msg) && item("Emma", "book").reviews.length === 0;
+      });
+      check("Feature 2: a review without a star rating is rejected", () => {
+        const msg = review("Emma", "book", "Cara", "Diaz", 0, "Fine.");
+        return /rating/.test(msg) && item("Emma", "book").reviews.length === 0;
+      });
+      check("Feature 2: a review without thoughts is rejected", () => {
+        const msg = review("Emma", "book", "Cara", "Diaz", 3, "   ");
+        return /thoughts/.test(msg) && item("Emma", "book").reviews.length === 0;
+      });
+      check("Feature 2: clicking a star shows the rating in words", () => {
+        const input = card("Emma", "book").querySelector('input[name="rating"][value="5"]');
+        input.checked = true;
+        input.dispatchEvent(new Event("change"));
+        return card("Emma", "book").querySelector(".rating-text").textContent === "5 out of 5 · Loved it";
+      });
+
+      // ================= Acceptance 5: saving =================
+      check("Acceptance 5: reloading keeps all titles and reviews", () => {
+        const reloaded = loadData();
+        const dune = reloaded.items.find((i) => i.title === "Dune" && i.type === "book");
+        return reloaded.items.length === 3 && dune && dune.reviews.length === 2;
+      });
+
+      // ================= Feature 5 / Acceptance 6: browse =================
+      check("Feature 5: titles are shown in alphabetical order", () => {
+        addTitle("film", "alien");
+        const t = shownTitles();
+        return t.join("|") === "alien|Dune|Dune|Emma";
+      });
+      check("Acceptance 6: the Books filter shows only books", () => {
+        setFilter("book");
+        return cards().every((c) => c.querySelector(".badge").textContent === "Book") && cards().length === 2;
+      });
+      check("Acceptance 6: the Films filter shows only films", () => {
+        setFilter("film");
+        return cards().every((c) => c.querySelector(".badge").textContent === "Film") && cards().length === 2;
+      });
+      check("Acceptance 6: searching by title narrows the list (any capitalization)", () => {
+        setFilter("all");
+        search("EMM");
+        return shownTitles().join("|") === "Emma";
+      });
+      check("Acceptance 6: a search with no matches says so", () => {
+        search("zzz");
+        const empty = document.getElementById("empty");
+        const ok = cards().length === 0 && !empty.hidden && /No titles match/.test(empty.textContent);
+        search("");
+        return ok;
+      });
+
+      // ================= Acceptance 7: plain text only =================
+      check("Acceptance 7: a title typed as HTML is shown as plain text", () => {
+        const evil = '<img src=x onerror="window.hacked=1">';
+        addTitle("book", evil);
+        return card(evil, "book") && !document.querySelector("#items img") && !window.hacked;
+      });
+      check("Acceptance 7: review thoughts typed as HTML are shown as plain text", () => {
+        const evil = "<b>bold</b>";
+        review("Emma", "book", "Cara", "Diaz", 3, evil);
+        const p = card("Emma", "book").querySelector(".review p");
+        return p.textContent === evil && !p.querySelector("b");
+      });
+    } catch (e) {
+      check("tests ran without crashing: " + e.message, () => false);
+    }
+
+    // Put back whatever reviews were saved before the tests ran.
+    try {
+      if (savedRealData === null) localStorage.removeItem(STORAGE_KEY_UNDER_TEST);
+      else localStorage.setItem(STORAGE_KEY_UNDER_TEST, savedRealData);
+    } catch (e) { /* storage blocked */ }
+
+    const failed = results.filter((r) => !r.ok).length;
+    const summary = document.getElementById("summary");
+    summary.textContent = failed === 0 ? `ALL ${results.length} TESTS PASSED` : `${failed} OF ${results.length} TESTS FAILED`;
+    summary.className = failed === 0 ? "pass" : "fail";
+    document.getElementById("results").innerHTML = results
+      .map((r) => `<li class="${r.ok ? "pass" : "fail"}">${r.ok ? "PASS" : "FAIL"} - ${r.name.replace(/</g, "&lt;")}</li>`)
+      .join("");
+  </script>
+</body>
+</html>

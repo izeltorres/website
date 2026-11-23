@@ -15,7 +15,26 @@ See `problem.md` for the problem, `SPEC.md` for how the site works, and `decisio
 No installs and no internet connection needed:
 
 1. Download or clone this repository.
-2. Open `index.html` in any web browser.
+2. Open `index.html` in any web browser. From a terminal in the repository folder:
+
+```
+start index.html        # Windows
+open index.html         # macOS
+xdg-open index.html     # Linux
+```
+
+## Running the tests
+The tests are in `tests/tests.html`. They load the site's `script.js`, go through every acceptance
+check in `SPEC.md`, and list PASS or FAIL for each one, with a total at the top. From a terminal in the
+repository folder:
+
+```
+start tests/tests.html        # Windows
+open tests/tests.html         # macOS
+xdg-open tests/tests.html     # Linux
+```
+
+The tests save any reviews already in your browser before they run, and put them back afterwards.
 
 ## Hosting it online for free (GitHub Pages)
 1. On GitHub, open this repository and go to **Settings → Pages**.
@@ -29,6 +48,7 @@ No installs and no internet connection needed:
 | `index.html` | The page layout |
 | `style.css` | The look of the page, including the star animation and dark mode |
 | `script.js` | Adding titles and reviews, the star rating, filters, and saving |
+| `tests/tests.html` | Automatic tests for the acceptance checks in `SPEC.md` |
 | `problem.md` | The problem and initial requirements |
 | `SPEC.md` | The specification |
 | `decision.md` | Decisions made for the project |
